@@ -1,0 +1,2 @@
+URL: https://gitlab.com/testuser/changelog-generator.git
+Result: {'host': 'gitlab.com', 'owner': 'testuser', 'repo': 'changelog-generator'}

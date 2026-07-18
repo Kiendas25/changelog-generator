@@ -1,0 +1,97 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Generate Changelog",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "changelog_gen.py",
+        "-o",
+        "CHANGELOG.md"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Generate CHANGELOG.md from git history using changelog-gen"
+    },
+    {
+      "label": "Generate Changelog (Since Last Tag)",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "changelog_gen.py",
+        "--since",
+        "${input:lastTag}",
+        "-o",
+        "CHANGELOG.md"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Generate changelog since a specific tag"
+    },
+    {
+      "label": "Generate Changelog (JSON)",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "changelog_gen.py",
+        "--format",
+        "json",
+        "-o",
+        "changelog.json"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Generate changelog as JSON for tooling"
+    },
+    {
+      "label": "Generate Changelog (Unreleased Only)",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "changelog_gen.py",
+        "--unreleased-only",
+        "-o",
+        "RELEASE_NOTES.md"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Generate draft release notes for next version"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "lastTag",
+      "type": "promptString",
+      "description": "Tag to generate changelog since (e.g., v1.0.0)",
+      "default": "v1.0.0"
+    }
+  ]
+}

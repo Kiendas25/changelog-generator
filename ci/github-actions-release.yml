@@ -1,0 +1,53 @@
+# Auto-generate CHANGELOG.md on tag push
+
+name: Release Changelog
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for git log
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Generate changelog
+        run: |
+          python -c "
+import urllib.request
+urllib.request.urlretrieve(
+    'https://raw.githubusercontent.com/Kiendas25/changelog-generator/main/changelog_gen.py',
+    'changelog_gen.py'
+)
+"
+          python changelog_gen.py -o CHANGELOG.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit changelog (optional - keeps repo history)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "chore: update CHANGELOG.md [skip ci]" || true
+          git push

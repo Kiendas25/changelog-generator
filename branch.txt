@@ -1,0 +1,4 @@
+stdout: * master
+
+stderr: 
+returncode: 0

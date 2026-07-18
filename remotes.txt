@@ -1,0 +1,2 @@
+origin	https://gitlab.com/testuser/changelog-generator.git (fetch)
+origin	https://gitlab.com/testuser/changelog-generator.git (push)

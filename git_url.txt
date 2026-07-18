@@ -1,0 +1,4 @@
+stdout: https://gitlab.com/testuser/changelog-generator.git
+
+stderr: 
+returncode: 0

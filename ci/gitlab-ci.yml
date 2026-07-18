@@ -1,0 +1,68 @@
+# Auto-generate CHANGELOG.md on tag push (GitLab CI)
+
+stages:
+  - changelog
+  - release
+
+generate_changelog:
+  stage: changelog
+  image: python:3.12-slim
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v/
+  script:
+    - python -c "
+import urllib.request
+urllib.request.urlretrieve(
+    'https://raw.githubusercontent.com/Kiendas25/changelog-generator/main/changelog_gen.py',
+    'changelog_gen.py'
+)
+"
+    - python changelog_gen.py -o CHANGELOG.md
+  artifacts:
+    paths:
+      - CHANGELOG.md
+    expire_in: 1 week
+
+create_release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  needs:
+    - job: generate_changelog
+      artifacts: true
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v/
+  script:
+    - |
+      cat CHANGELOG.md | sed -n '/^## \[Unreleased\]/,/^## \[/p' | head -n -1 > release_notes.md
+      if [ ! -s release_notes.md ]; then
+        # Fallback: show latest version section
+        awk '/^## \[v/{if(p)exit; p=1} p' CHANGELOG.md > release_notes.md
+      fi
+    - |
+      release-cli create \
+        --name "Release $CI_COMMIT_TAG" \
+        --tag-name "$CI_COMMIT_TAG" \
+        --description "$(cat release_notes.md)" \
+        --ref "$CI_COMMIT_SHA"
+
+include_changelog_in_repo:
+  stage: changelog
+  image: python:3.12-slim
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v/
+  script:
+    - python -c "
+import urllib.request
+urllib.request.urlretrieve(
+    'https://raw.githubusercontent.com/Kiendas25/changelog-generator/main/changelog_gen.py',
+    'changelog_gen.py'
+)
+"
+    - python changelog_gen.py -o CHANGELOG.md
+    - git config user.name "GitLab CI"
+    - git config user.email "gitlab-ci@gitlab.com"
+    - git add CHANGELOG.md
+    - git commit -m "chore: update CHANGELOG.md [skip ci]" || true
+    - git push origin HEAD:$CI_COMMIT_REF_NAME
+  only:
+    - tags

@@ -1,0 +1,5 @@
+stdout: 
+stderr: error: src refspec main does not match any
+error: failed to push some refs to 'https://github.com/Kiendas25/changelog-generator.git'
+
+returncode: 1

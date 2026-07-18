@@ -1,0 +1,2 @@
+# Zero dependencies — stdlib only
+# This file exists for pip compatibility only
